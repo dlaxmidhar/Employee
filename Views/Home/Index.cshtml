@@ -1,0 +1,173 @@
+﻿@{
+    ViewData["Title"] = "Home Page";
+    string Email = ViewBag.Email;
+
+    string Error = ViewBag.Error;
+    Layout = "~/Views/Shared/Layout1.cshtml";
+}
+
+<head>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+
+<body class="button">
+    <br />
+    <br />
+    <br />
+
+    <div class="container">
+        <div class="row">
+            <div class="col-md-6 mx-auto">
+                <div class="card border border-warning border-4" style="border-radius:50px; height:40rem;">
+                    <div class="card-body">
+                        <div class="rounded-circle d-flex justify-content-center align-items-center">
+                            <img src="~/mdb5-free-standard/img/ceilogo.png" class="img-fluid" style="outline: 3px solid gold; border-radius:50%;" alt="Logo" />
+                            <br /><br /><br />
+                        </div>
+                        <br />
+                        <!--username-->
+
+                        <div class="d-flex p-2 text-black mx-5 font-weight-bold" style="flex-direction:column;align-items:center;justify-content:center;">
+                            <div>
+                                <b class="">Username</b>
+                                <input type="text" id="email" name="email" class="form-control rounded-7 w-50 d-inline p-2 border-warning" />@@ceiamerica.com
+                                <span class="text-center"><div id="email-error" class="text-danger"></div></span>
+                                <br />
+                                <div id="email-error" class="text-danger"></div>
+                            </div>
+
+                            <div>
+                                <button type="button" id="load-index" class="rounded-7 button text-white btn-outline-warning" data-mdb-toggle="collapse" data-mdb-target="#extra-portion" aria-controls="collapse" aria-expanded="false">Send OTP</button>
+                                <span id="timerDisplay" class="mx-3"></span>
+                            </div>
+                            <br />
+                        </div>
+
+                        <!--OTP-->
+                        <form method="post" action="/home/LoginAuth" onsubmit="return VerifyOtp(event)">
+                            <div>
+                                <div id="my-div" class="d-none d-flex p-2 text-black mx-5 font-weight-bold" style="flex-direction:column;align-items:center;justify-content:center; position:relative; left:-20px;">
+                                    <b>OTP</b>
+                                    <input type="text" id="userotp" name="userotp" class="form-control rounded-7 w-50 mx-5 d-inline p-2 border-warning" />
+                                    <span class="text-center"><div id="otp-error" class="text-danger"></div></span>
+                                    <br />
+
+                                    <div style="margin-left:0px">
+                                        <button type="submit" id="sendOTP" class="cei-color rounded-7 button text-white btn-outline-warning" data-mdb-target="#extra-portion" aria-controls="collapse" aria-expanded="false">Login</button>
+                                    </div>
+                                    <br /><br />
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function VerifyOtp(event) {
+            event.preventDefault();
+            var userotp = document.getElementById("userotp");
+            var userotpval = userotp.value;
+            var email = document.getElementById("email");
+            const error = document.getElementById('otp-error');
+            var emailval = email.value + "@@ceiamerica.com";
+            var xhr = new XMLHttpRequest();
+            var url = '/home/LoginAuth';
+            var params = 'email2=' + encodeURIComponent(emailval) + '&userotp=' + encodeURIComponent(userotpval);
+
+            xhr.open('POST', url, true);
+            xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+
+            xhr.onload = function () {
+                if (xhr.status === 200) {
+                    console.log(xhr.responseText);
+                    if (xhr.responseText === "Invalid OTP") {
+                        error.innerText = "Please enter a valid OTP.";
+                    } else if (xhr.responseText === "Expired OTP") {
+                        error.innerText = "Expired OTP";
+                    } else {
+                        window.location.href = "https://localhost:7000/home/LoginAuth?email2=" + emailval;
+                    }
+                } else {
+                    console.log('Error: ' + xhr.status);
+                }
+            };
+
+            xhr.send(params);
+        }
+    </script>
+
+    <script>
+        const loadIndexBtn = document.getElementById('load-index');
+        loadIndexBtn.addEventListener('click', function () {
+            const emailError = document.getElementById('email-error');
+            const divToShow = document.getElementById('my-div');
+            const email = document.getElementById('email').value;
+            const emailwork = document.getElementById('email');
+            const sendotpbtn = document.getElementById('load-index');
+
+            if (email === '') {
+                divToShow.classList.add('d-none');
+                emailwork.focus();
+                emailError.innerText = 'Enter Username';
+                return;
+            } else {
+                const xhr = new XMLHttpRequest();
+                xhr.open('POST', '/home/Emailcheck');
+                xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+                xhr.onload = function () {
+                    if (xhr.status === 200) {
+                        const response = JSON.parse(xhr.responseText);
+                        if (response) {
+                            divToShow.classList.remove('d-none');
+                            emailError.innerText = '';
+                            let duration = 30;
+                            startTimer(duration);
+
+                            function startTimer(duration) {
+                                let timer = duration;
+                                const timerDisplay = document.getElementById('timerDisplay');
+                                const intervalId = setInterval(function () {
+                                    const seconds = parseInt(timer % 60, 10);
+                                    timerDisplay.textContent = seconds < 30 ? seconds : '';
+                                    if (timer === duration) {
+                                        sendotpbtn.style.backgroundColor = 'gray';
+                                        sendotpbtn.disabled = true;
+                                    }
+                                    if (--timer < 0) {
+                                        clearInterval(intervalId);
+                                        timerDisplay.textContent = '';
+                                        sendotpbtn.innerHTML = 'Resend OTP';
+                                        sendotpbtn.style.backgroundColor = '';
+                                        sendotpbtn.disabled = false;
+                                    }
+                                }, 1000);
+                            }
+
+                            const xhr2 = new XMLHttpRequest();
+                            xhr2.open('POST', '/Home/Index');
+                            xhr2.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+                            xhr2.onload = function () {
+                                if (xhr2.status === 200) {
+                                    console.log('Done sending mail');
+                                } else {
+                                    console.log('Request failed. Returned status of ' + xhr2.status);
+                                }
+                            };
+                            xhr2.send('email=' + encodeURIComponent(email));
+                        } else {
+                            divToShow.classList.add('d-none');
+                            emailError.innerText = 'Invalid Username';
+                            emailwork.focus();
+                        }
+                    } else {
+                        console.log('Request failed. Returned status of ' + xhr.status);
+                    }
+                };
+                xhr.send('email=' + encodeURIComponent(email));
+            }
+        });
+    </script>
+</body>

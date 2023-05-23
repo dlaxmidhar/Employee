@@ -1,0 +1,201 @@
+﻿@model RavenDbFinalTest.Models.Company
+
+@{
+    ViewData["Title"] = "AdminCreate";
+}
+<head>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-KK94CHFLLe+nY2dmCWGMq91rCGa5gtU4mk92HdvYe+M/SXH301p5ILy+dN9+nJOZ" crossorigin="anonymous">
+
+
+</head>
+<br />
+<br />
+
+
+
+
+<div class="container " style="margin-top:0px;">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <br />
+                <div class="card-header">
+                    <h1 class="text-center">Create Employee</h1>
+
+                    <div class="d-flex justify-content-end mb-3">
+                        <a class="btn btn-primary mx-3" asp-action="ListEmployee">Back to List</a>
+                    </div>
+                </div>
+
+
+                <div class="card-body hover-zoom">
+                    <form asp-action="CreateEmployee">
+                        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                        <div class="form-group row">
+                            <label for="eid" class="col-md-4 col-form-label text-md-right">Employee ID</label>
+                            <div class="col-md-6">
+                                <input asp-for="eid" id="Employeeid" class="form-control" />
+                                <span asp-validation-for="eid" id="errorId" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <br />
+                        <div class="form-group row">
+                            <label for="Name" class="col-md-4 col-form-label text-md-right">Name</label>
+                            <div class="col-md-6">
+                                <input asp-for="Name" id="name" class="form-control" />
+                                <span asp-validation-for="Name" id="NameError" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <br />
+                        <div class="form-group row">
+                            <label for="role" class="col-md-4 col-form-label text-md-right">Role</label>
+                            <div class="col-md-6">
+                                <input asp-for="role" id="role" class="form-control" />
+                                <span asp-validation-for="role" id="roleError" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <br />
+                        <div class="form-group row">
+                            <label for="Phone" class="col-md-4 col-form-label text-md-right">Phone</label>
+                            <div class="col-md-6">
+                                <input type="number" asp-for="Phone" id="phone" class="form-control" />
+                                <span asp-validation-for="Phone" id="error" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <br />
+                        <div class="form-group row">
+                            <label for="EmailId" class="col-md-4 col-form-label text-md-right">Email</label>
+                            <div class="col-md-6">
+                                <input type="email" asp-for="EmailId" id="email" class="form-control" />
+                                <span asp-validation-for="EmailId" id="emailerror" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <br />
+                        <div class="form-group row mb-0">
+                            <div class="col-md-6 offset-md-4">
+                                <button id="submit" type="submit" class="btn btn-primary">Create</button>
+                            </div>
+                        </div>
+                        @if (TempData["SuccessMessage"] != null)
+                        {
+                            <div id="success-alert" class="alert alert-success w-50" role="alert">
+                                @TempData["SuccessMessage"]
+                            </div>
+
+                        }
+                    </form>
+
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+        <script>
+            // Wait 3 seconds and then hide the success alert
+            setTimeout(function () {
+                var successAlert = document.getElementById("success-alert");
+                if (successAlert != null) {
+                    successAlert.style.transition = "opacity 0.5s ease-out";
+                    successAlert.style.opacity = 0;
+                    setTimeout(function () {
+                        successAlert.parentNode.removeChild(successAlert);
+                    }, 500);
+                }
+            }, 3000);
+
+
+            const phonenumber = document.getElementById('phone');
+            const msg = document.getElementById('error');
+
+            function validatePhoneNumber(phoneNumber) {
+                const regex = /^([+][0-9]{2})?[6-9]\d{9}$/;
+                if (!regex.test(phoneNumber)) {
+                    event.preventDefault();
+                    msg.innerText = "Invalid Phone Number";
+                } else {
+                    msg.innerText = "";
+                }
+            }
+
+            phonenumber.addEventListener("input", function () {
+                validatePhoneNumber(phonenumber.value);
+            });
+            //Email valiidation
+            const email = document.getElementById('email');
+            const EmailError = document.getElementById('emailerror');
+
+            function validateEmail(email) {
+                const regex = /^\w+@@ceiamerica\.com$/;
+                if (regex.test(email) == false) {
+                    event.preventDefault();
+                    EmailError.innerText = "Invalid Email Address";
+                }
+                else{
+                    EmailError.innerText="";
+                }
+            }
+            //Name Validation
+            const Name = document.getElementById("name");
+            const nameError = document.getElementById("NameError");
+
+            function validateName(Name) {
+                var nameregex = /^[a-zA-Z\s]{2,20}$/;
+                if (nameregex.test(Name) == false) {
+                    event.preventDefault();
+                    nameError.innerText = "Please enter valid Name";
+
+                }
+                else{
+                    nameError.innerText="";
+                }
+            }
+            //role
+            const Role = document.getElementById("role");
+            const RoleError = document.getElementById("roleError");
+            function validateRole(Role) {
+                var roleregex = /^(Developer|sales|Tester)$/i;
+                if (roleregex.test(Role) == false) {
+                    event.preventDefault();
+                    RoleError.innerText = "Enter either Developer or Tester or Sales";
+
+                }
+                else{
+                    RoleError.innerText="";
+                }
+            }
+            //id validation
+            const Id = document.getElementById("Employeeid");
+            const ErrorId = document.getElementById("errorId");
+
+            function validateId(Id) {
+                const idregex = /^[0-9]{2,5}$/;
+                if (idregex.test(Id) == false) {
+                    event.preventDefault();
+                    ErrorId.innerText = "The id should be 2 to 5 integer";
+                }
+                else{
+                    ErrorId.innerText="";
+                }
+
+            }
+            const createbtn = document.getElementById("submit");
+            createbtn.addEventListener("click", function () {
+                validatePhoneNumber(phonenumber.value);
+                validateEmail(email.value);
+                validateName(Name.value);
+                validateRole(Role.value);
+                validateId(Id.value);
+            })
+        </script>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.min.js" integrity="sha384-/aMki7JhW9yvCh+6EjikSlPp8sINsJ6xh39Q1/+qzT0o0UW07OrUJQ2Nmfq3nqKj" crossorigin="anonymous"></script>
+
+    }
+}

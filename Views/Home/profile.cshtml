@@ -1,0 +1,400 @@
+﻿@model dynamic
+@{
+    ViewData["Title"] = "profile";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    HttpContextAccessor httpContextAccessor = new HttpContextAccessor();
+    string eid = httpContextAccessor.HttpContext.Session.GetString("usereid");
+}
+<head>
+    <style>
+        .crop-container {
+            position: relative;
+        }
+
+
+        .preview-container {
+            position: fixed;
+            top: 100px;
+            left: 10px;
+            display: none;
+        }
+
+        #preview {
+            width: 100px;
+            height: 100px;
+            border: 2px solid black;
+        }
+
+        .preview-container.show {
+            display: inline;
+        }
+
+        input[readonly] {
+            background-color: #f9f9f9; /* Grey out readonly fields */
+            cursor: not-allowed; /* Change cursor on readonly fields */
+        }
+
+        input {
+            border: 1px solid #fff; /* Add border to all fields */
+            border-radius: 4px; /* Round the corners of all fields */
+            padding: 5px; /* Add some padding to all fields */
+        }
+
+            input:not([readonly]):focus {
+                border-color: #151566; /* Highlight focused fields */
+                box-shadow: 0 0 5px rgba(21, 21, 102, 0.5), 0 0 10px rgba(21, 21, 102, 0.5), 0 0 25px rgba(21, 21, 102, 0.5);
+            }
+    </style>
+    <meta name="viweport"  content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.css" integrity="sha512-C4k/QrN4udgZnXStNFS5osxdhVECWyhMsK1pnlk+LkC7yJGCqoYxW4mH3/ZXLweODyzolwdWSqmmadudSHMRLA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css" integrity="sha512-cyzxRvewl+FOKTtpBzYjW6x6IAYUCZy3sGP40hn+DQkqeluGRCax7qztK2ImL64SA+C7kVWdLI6wvdlStawhyw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+</head>
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-6 col-lg-3 mb-1 position-relative" style="top:180px;height: 259px;left:80px;">
+
+            <div class="shadow-6-strong rounded-9 h-100 bg-white border border-1 border-secondary" id="profile" style="box-sizing: border-box;">
+
+                <img id="test2" height="220px" width="100px" src=" @Url.Action("GetImage", new { id = eid })" class="  position-absolute  start-50 translate-middle " style="z-index:9999; position: absolute;border-radius: 40px;width: 228px;height: 204px;object-fit: cover;box-shadow: 0px 0px 50px 0px rgba(0, 0, 0, 0.30);">
+
+
+
+                <div class="position-absolute  start-50 translate-middle-x" style="top:180px;">
+                    <h3 class="text-center text-grey" style="background: linear-gradient(180deg, #000 37.5%, red 56.25%, #000);-webkit-background-clip: text;  -webkit-text-fill-color: transparent;text-shadow: 4px 4px 10px rgba(0, 0, 0, 0.5);">@Model.firstName</h3>
+                </div>
+                <div class="btn-primary position-absolute " style="right:90px;top:100px;border:1px solid rgba(0,0,0,0.25);border-radius:50%">
+                    <button onclick="selectImage()" class="position-absolute bg-white btn-primary  rounded-circle " style="bottom:0px; border:0px solid rgb(0,0,0)">
+                        <img onclick="selectImage()" id="camera-img" src="https://static.vecteezy.com/system/resources/thumbnails/006/998/431/small/photo-camera-icons-photo-camera-icon-design-illustration-photo-camera-simple-sign-photo-camera-image-vector.jpg" style="width:40px; margin-left:28px;margin-bottom:-10px; height: 40px;border-radius:50%;">
+                        <form id="upload-form" enctype="multipart/form-data" style="display:none;">
+                            <input type="file" name="file" id="file">
+                        </form>
+                    </button>
+                </div>
+
+
+
+                <!-- Old code here -->
+                <div class="preview-container">
+                    <h4>Preview</h4>
+                    <div style="position:relative; top:110px;">
+                        <img style="width: 150px;height:150px; border: 2px solid black;" id="image" src="#" />
+
+                    </div>
+                    <button type="button" id="Uploadimg" class="btn btn-primary  ms-2 mt-1 " style="background-color: #151566; position:absolute;top:290px;left:50px; ">Upload</button>
+                </div>
+
+
+
+
+            </div>
+            <p class=" text-center " style="position: absolute; top: 205px; left: 0; width: 100%; font-size: var(--font-size-lg); color: rgba(0, 0, 0, 0.59); display: inline-block;">@Model.job_Title </p>
+
+        </div>
+        <div class="col-lg-8 col-md-12 col-lg-1 mb-1 position-relative" style="height: auto; top:10px; left:5rem;">
+            <div class="shadow-6-strong rounded-9 h-100 bg-white border-opacity-10 border-1 " style="box-sizing: border-box;border:1px solid rgba(0,0,0,.25)">
+                <!-- your content here -->
+                <div class="position-absolute mt-4 fs-2 fw-bold text-dark bg-white text-opacity-75 px-2 " style="left:40px;width: 16.4375rem;border-radius:20px;">
+                    Edit Profile
+                </div>
+                <div class="position-relative bg-dark bg-opacity-10 border border-1 w-100" style="height: 9.125rem;border:1px solid rgb(0,0,0,0.95);border-radius:20px 20px 0px 0px;">
+                    <button class="position-absolute bg-transparent  border-0 mt-5 fs-5 fw-bold text-dark" style="left:30px;top:50px;">User Info</button>
+                    <div class="position-absolute  rounded-9" style="top:135px;left:40px;width:5rem;height: 0.5rem; background-color: #151566;"></div>
+
+                </div>
+                <form method="post" action="@Url.Action("Edit")">
+                    <div class="ms-1 mt-4 row col-lg-12 col-md-12 col-sm-4" style="position:relative;left:20px;">
+                        <div class="col-md-6 col-sm-7 col-lg-6">
+                            <div class="col-10 mb-4">
+                                <label for="firstName" class="form-label fs-5  ">First Name</label>
+                                <input value="@Model.firstName" type="text" class="form-control " style="height:40px;" id="firstName" name="firstName" readonly>
+                            </div>
+                            <div class="mb-4 col-10 ">
+                                <label for="address" class="form-label fs-5">Address</label>
+                                <input value="@Model.address" type="text" class="form-control" style="height:40px;" id="address" name="address" readonly>
+                                <span id="addressError" style="color: red; font-weight: bold;"></span>
+                            </div>
+                            <div class="col-10 mb-4">
+                                <label for="email" class="form-label fs-5">Email</label>
+                                <input value="@Model.email" type="email" class="form-control" style="height:40px;" id="email" name="email" readonly>
+                            </div>
+                            <div class="col-10 mb-4">
+                                <label for="phone" class="form-label fs-5">Phone Number</label>
+                                <input value="@Model.phone_Number" type="tel" class="form-control" style="height:40px;" id="phone" name="phone_Number" readonly>
+                                <span id="error" style="color: red; font-weight: bold;"></span>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="col-10 mb-4">
+                                <label for="lastName" class="form-label fs-5">Last Name</label>
+                                <input value="@Model.lastName" type="text" class="form-control" style="height:40px;" id="lastName" name="lastName" readonly>
+
+                            </div>
+                            <div class="mb-4 col-10 ">
+                                <label for="jobTitle" class="form-label fs-5">Job Title</label>
+                                <input value="@Model.job_Title" type="text" class="form-control" style="height:40px;" id="jobTitle" name="job_Title" readonly>
+                                <span id="joberror" style="color: red; font-weight: bold;"></span>
+                            </div>
+                            <div class="mb-4 col-10 ">
+                                <label for="department" class="form-label fs-5">Department</label>
+                                <input value="@Model.department" type="text" class="form-control" style="height:40px;" id="department" name="department" readonly>
+                                <span id="deptError" style="color: red; font-weight: bold;"></span>
+                            </div>
+                            <div class="mb-4 col-10 ">
+                                <label for="manager" class="form-label fs-5">Manager</label>
+                                <input value="@Model.manager" type="text" class="form-control" style="height:40px;" id="manager" name="manager" readonly>
+                                <span id="managerError" style="color: red; font-weight: bold;"></span>
+                            </div>
+
+                        </div>
+                        <div class="mb-5 input-group-append ">
+                            @if (ViewBag.successmessage != null)
+                            {
+
+                            }
+                            else
+                            {
+                                <button style="width:100px;" class="btn btn-secondary " type="button" id="edit-button">Edit</button>
+                            }
+
+
+                            @if (ViewBag.successmessage != null)
+                            {
+                                <button type="submit" class="btn btn-primary w-25 ms-2 mt-1" style="background-color: #151566; " disabled>Requested</button>
+                            }
+                            else
+                            {
+                                <button type="submit" id="submit" class="btn btn-primary " style="background-color: #151566; ">Request to Update</button>
+                            }
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js" integrity="sha512-6lplKUSl86rUVprDIjiW8DuOniNX8UDoRATqZSds/7t6zCQZfaCe3e5zcGaQwxa8Kpn5RTM9Fvl3X2lLV4grPQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.js" integrity="sha512-LjPH94gotDTvKhoxqvR5xR2Nur8vO5RKelQmG52jlZo7SwI5WLYwDInPn1n8H9tR0zYqTqfNxWszUEy93cHHwg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script>
+
+    const editButton = document.getElementById("edit-button");
+    const inputFields = document.querySelectorAll("input:not(#email):not(#firstName):not(#lastName)");
+
+    editButton.addEventListener("click", () => {
+        const isEditable = editButton.textContent === "Edit";
+        inputFields.forEach((input) => {
+
+            input.readOnly = !input.readOnly;
+        });
+        editButton.textContent = isEditable ? "Cancel" : "Edit";
+    });
+
+    //Phone number Validation
+    const phonenumber = document.getElementById('phone');
+    const msg = document.getElementById('error');
+
+    function validatePhoneNumber(event, phonenumber) {
+        const regex = /^(?!([0-9])\1+$)[6-9][0-9]{9}$/;
+        if (regex.test(phonenumber) == false) {
+            event.preventDefault();
+            msg.innerText = "Please enter a valid phone number";
+        }
+        else {
+            msg.innerText = "";
+        }
+    }
+
+
+    //Address Validation
+    const addressInput = document.getElementById("address");
+    const ErrorInput = document.getElementById("addressError");
+
+    function validateAddress(event, address) {
+        const regex = /^(?!\d+$)[a-zA-Z0-9\s,'-]*$/;
+        if (!regex.test(address)) {
+          
+            event.preventDefault();
+            ErrorInput.innerText = "Please enter a valid address";
+        } else {
+            ErrorInput.innerText = "";
+        }
+    }
+    //Job Title
+    const jobInput = document.getElementById("jobTitle");
+    const jobError = document.getElementById("joberror");
+
+    function validateJob(event, job) {
+        const regex = /^[a-zA-Z\s]+$/;
+        if (!regex.test(job)) {
+            event.preventDefault();
+            jobError.innerText = "Please enter a valid job title";
+        } else {
+            jobError.innerText = "";
+
+        }
+    }
+
+    //Department
+    const deptInput = document.getElementById("department");
+    const deptError = document.getElementById("deptError");
+
+    function validateDept(event, dept) {
+        const regex = /^[a-zA-Z\s]+$/;
+        if (!regex.test(dept)) {
+
+            event.preventDefault();
+            deptError.innerText = "Please enter a valid department";
+        } else {
+            deptError.innerText = "";
+        }
+    }
+    //Manager
+    const managerInput = document.getElementById("manager");
+    const managerError = document.getElementById("managerError");
+
+    function validateManager(event, manager) {
+        const regex = /^[a-zA-Z\s]+$/;
+        if (!regex.test(manager)) {
+
+            event.preventDefault();
+            managerError.innerText = "Please enter a valid manager name";
+        } else {
+            managerError.innerText = "";
+        }
+    }
+    const createbtn = document.getElementById("submit");
+    createbtn.addEventListener("click", function (event) {
+        validatePhoneNumber(event, phonenumber.value);
+        validateAddress(event, addressInput.value);
+        validateJob(event, jobInput.value);
+        validateDept(event, deptInput.value);
+        validateManager(event, managerInput.value);
+
+    });
+
+
+
+
+</script>
+
+
+
+<script>
+
+
+
+
+
+
+    // Function to select image file
+    function selectImage() {
+
+        document.getElementById("file").click();
+    }
+
+    var cropper = null;
+    var image = document.getElementById('image'); // camera icon
+    var inputImage = document.getElementById('file');  // image file
+    var uploadBtn = document.getElementById('Uploadimg');
+    var preview = document.getElementById('preview'); // preview section
+
+    inputImage.addEventListener('change', function () {
+        // Load image into Cropper.js
+
+        // show the preview
+
+        $('.preview-container').addClass('show');
+
+
+        //all code
+        var files = this.files;
+        var file = files[0];
+        var reader = new FileReader();
+        reader.onload = function () {
+            image.src = reader.result;
+            cropper = new Cropper(image, {
+                aspectRatio: 1,
+                viewMode: 1,
+                crop: function (event) {
+                    // Update preview element with cropped image
+                    var croppedCanvas = cropper.getCroppedCanvas();
+                    var croppedImage = croppedCanvas.toDataURL();
+                    document.getElementById("test2").src = croppedImage;
+                }
+            });
+            uploadBtn.style.display = 'block';
+        }
+        reader.readAsDataURL(file);
+    });
+
+    uploadBtn.addEventListener('click', function () {
+
+
+        // Get cropped image data and upload to server
+        var croppedCanvas = cropper.getCroppedCanvas();
+
+        var croppedDataUrl = croppedCanvas.toDataURL();
+        var croppedImageData = croppedDataUrl.split(',')[1];
+
+        var xhr = new XMLHttpRequest();
+        xhr.open("POST", "/Home/UploadImage", true);
+        xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+        xhr.onload = () => {
+            if (xhr.status == 200) {
+
+                console.log("Response data" + xhr.responseText);
+                alert(xhr.responseText);
+                window.location.href = "https://localhost:7000/Home/Profile/" + @eid;
+            }
+        }
+        xhr.send("imageFile=" + encodeURIComponent(croppedImageData));
+
+
+
+
+        /*   // Reset input, preview, and Cropper.js
+           inputImage.value = '';
+           preview.innerHTML = '';
+           cropper.destroy();
+           cropper = null;
+           uploadBtn.style.display = 'none';
+           image.src = '#';*/
+    });
+</script>
+
+<!--
+
+ // Function to upload image file
+    function uploadImage() {
+
+
+
+
+        var fileInput = document.getElementById("file");
+        if (fileInput.files.length == 0) {
+            alert("Please select an image file to upload.");
+            return;
+        }
+        var formData = new FormData();
+        formData.append("imageFile", fileInput.files[0]);
+
+
+
+        // Make an AJAX request to upload the file
+        var xhr = new XMLHttpRequest();
+        xhr.open("POST", "/Home/UploadImage");
+        xhr.onload=()=>{
+            if(xhr.status==200){
+                window.location.href = "https://localhost:7000/Home/Profile/"+@eid;
+            }
+        }
+        xhr.send(formData);
+
+    }
+
+
+
+
+</script>
+*/-->
